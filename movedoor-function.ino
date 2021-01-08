@@ -14,11 +14,14 @@ int closeDoorBlynk;
 BLYNK_WRITE(V1){//a button set as push in blynk
     openDoorBlynk=param.asInt();
     testLoop();//does this run without variables passed into it
-    moveDoor(0,1);
+    if(openDoorBlynk ==1) {
+        openDoor();
+    }
+    //moveDoor(0,1);
 }
 BLYNK_WRITE(V2){
     closeDoorBlynk=param.asInt();
-    moveDoor(0,0);
+    //moveDoor(0,0);
 }
 
 
@@ -57,6 +60,9 @@ void moveDoor(int whenToStart, bool openIt) {//whenToStart sets the delay time b
     }
     else if(!doorMoving && openIt){//make sure door still isn't moving and if we should open the door
         int delayDoorMove = timer.setTimeout(whenToStart, [] () {//assign the delay from moveDoor function
+            terminal.print(Time.format("%D %r - "));
+            //terminal.println(whenToStart);
+            terminal.flush();
             openDoor();
         });
     }
@@ -77,7 +83,11 @@ void moveDoor(int whenToStart, bool openIt) {//whenToStart sets the delay time b
 void openDoor() {
     doorMoving = 1;//door will begin moving in next line of code
     digitalWrite(doorOpen,LOW); //door is opening
+    terminal.print(Time.format("%D %r - "));
+    terminal.println("In openDoor function");
     int stopMovement = timer.setTimeout(2000L, [] () { //give to door time to open completely
+        terminal.println("turning off openDoor");
+        terminal.flush();
         digitalWrite(doorOpen, HIGH); //once all the way open, shut off the relay
         doorMoving = 0; //door is no longer moving
         doorState = 1;  //door is now open
@@ -93,5 +103,3 @@ void closeDoor() {
        doorState = 0;  //door is now closed
     });
 }
-
-
